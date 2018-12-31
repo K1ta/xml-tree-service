@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'com.palantir.docker' version '0.20.1'
+}
+
+group 'xmltree'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+task fatJar(type: Jar) {
+    //set name of jar
+    baseName = project.name + '-fat'
+    //create manifest
+    manifest {
+        attributes 'Main-Class': 'xmltree.Main'
+    }
+    //include dependencies
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+docker {
+    name = project.name
+    files fatJar.outputs
+}
+
+dependencies {
+    // one-nio server
+    compile group: 'ru.odnoklassniki', name: 'one-nio', version: '1.0.2'
+
+    // logging
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.9'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.0.9'
+}
+
+tasks.getByName('build').dependsOn('fatJar')
+tasks.getByName('build').finalizedBy('docker')
