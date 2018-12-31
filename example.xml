@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <level1 param="test">
+        <level2>
+            this is test xml
+        </level2>
+    </level1>
+</root>
